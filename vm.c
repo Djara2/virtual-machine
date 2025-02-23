@@ -4,11 +4,6 @@
 
 #define vm_not(x) x & 0x8000000000000000
 
-// Doing bitwise AND on any number produces 0x8000000000000000 (equal)
-// if the other number is negative. Otherwise, it is unequal.
-unsigned long NOT_MASK = 0x8000000000000000;
-unsigned long registers[16];
-
 enum v_register {
 	GP1,  // General Purpose integer registers
 	GP2,  // |
@@ -33,6 +28,9 @@ enum v_register {
 };
 
 enum vm_operation {
+	COPY,
+	SET,
+
 	ADDR,
 	ADDI,
 	ADDFR,
@@ -56,6 +54,33 @@ enum vm_operation {
 	JUMPU
 };
 
+// Doing bitwise AND on any number produces 0x8000000000000000 (equal)
+// if the other number is negative. Otherwise, it is unequal.
+unsigned long NOT_MASK = 0x8000000000000000;
+unsigned long registers[16];
+unsigned long stack[512];
+
+registers[SP] = 0;
+
+// like "move" in other assemblies
+void copy(enum v_register dest, enum v_register r1) {
+	registers[dest] = registers[r1];
+}
+
+// Set lower 32 bits of a regular register 
+void setu(enum v_register dest,  uint32_t i) {
+	
+}
+
+// Set upper 32 bits of a regular register
+void setl(enum v_register dest, uint32_t i) {
+
+}
+
+void setf(enum v_register dest_f, float f) {
+	registers[dest_f] = f;
+}
+
 // Sum of 2 regular registers
 void addr(enum v_register dest, enum v_register r1, enum v_register r2) {
 	registers[dest] = registers[r1] + registers[r2];
@@ -77,6 +102,9 @@ void addfi(enum v_register dest, enum v_register r1_f, float f) {
 }
 
 void (*operation_table)(enum operation) {
+	[COPY] = copy,
+	[SET]  = set,
+
 	[ADDR] = addr,
 	[ADDI] = addi,
 	[ADDF] = addf,
