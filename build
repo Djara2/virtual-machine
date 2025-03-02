@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+gcc vm.c -o vm
